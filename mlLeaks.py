@@ -1,4 +1,12 @@
 '''
+Author: Ruijun Deng
+Date: 2024-05-18 16:11:50
+LastEditTime: 2024-05-19 16:38:23
+LastEditors: Ruijun Deng
+FilePath: /ML-Leaks-ndss19/mlLeaks.py
+Description: 
+'''
+'''
 Created on 5 Dec 2018
 
 @author: Wentao Liu, Ahmed Salem
@@ -87,7 +95,8 @@ def load_data(data_name):
 		train_x, train_y = [f['arr_%d' % i] for i in range(len(f.files))]
 	return train_x, train_y
 
-
+# attack one,two,three
+# 训练attack model
 def trainAttackModel(X_train, y_train, X_test, y_test):
 	dataset = (X_train.astype(np.float32),
 			   y_train.astype(np.int32),
@@ -102,7 +111,9 @@ def trainAttackModel(X_train, y_train, X_test, y_test):
 									l2_ratio = 1e-6,
 									model='softmax')
 
-	return output
+	return output # 返回一个训练模型
+
+
 
 # def preprocessesCIFAR(X):
 # 	#normalizing the CIFAR data
@@ -207,7 +218,7 @@ def initializeTargetModel(dataset,num_epoch,dataFolderPath= './data/',modelFolde
 	except OSError:
 		pass
 	print("Training the Target model for {} epoch".format(num_epoch))
-	targetTrain, targetTrainLabel  = load_data(dataPath + '/targetTrain.npz')
+	targetTrain, targetTrainLabel  = load_data(dataPath + '/targetTrain.npz') # 本身下载好了存储下来的
 	targetTest,  targetTestLabel   = load_data(dataPath + '/targetTest.npz')
 	attackModelDataTarget, attackModelLabelsTarget, targetModelToStore = trainTarget(classifierType,targetTrain, targetTrainLabel, X_test=targetTest, y_test=targetTestLabel, splitData= False, inepochs=num_epoch, batch_size=100) 
 	np.savez(attackerModelDataPath + '/targetModelData.npz', attackModelDataTarget, attackModelLabelsTarget)
@@ -223,17 +234,20 @@ def initializeShadowModel(dataset,num_epoch,dataFolderPath= './data/',modelFolde
 	except OSError:
 		pass
 	print("Training the Shadow model for {} epoch".format(num_epoch))
+	# 加载数据
 	shadowTrainRaw, shadowTrainLabel  = load_data(dataPath + '/shadowTrain.npz')
 	targetTestRaw,  shadowTestLabel   = load_data(dataPath + '/shadowTest.npz')
+
+	# 训练模型
 	attackModelDataShadow, attackModelLabelsShadow, shadowModelToStore = trainTarget(classifierType, shadowTrainRaw, shadowTrainLabel, X_test=targetTestRaw, y_test=shadowTestLabel, splitData= False, inepochs=num_epoch, batch_size=100) 
-	np.savez(attackerModelDataPath + '/shadowModelData.npz', attackModelDataShadow, attackModelLabelsShadow)
+
+	# 存储
+	np.savez(attackerModelDataPath + '/shadowModelData.npz', attackModelDataShadow, attackModelLabelsShadow) # 
 	np.savez(modelPath + '/shadowModel.npz', *lasagne.layers.get_all_param_values(shadowModelToStore))
 	return attackModelDataShadow, attackModelLabelsShadow
+		
 	
-	
-
-	
-
+# 生成数据
 def generateAttackData(dataset, classifierType, dataFolderPath ,pathToLoadData ,num_epoch ,preprocessData ,trainTargetModel ,trainShadowModel,topX=3 ):
 	attackerModelDataPath = dataFolderPath+dataset+'/attackerModelData'
 	if(preprocessData):
@@ -271,6 +285,7 @@ def attackerThree(dataset= 'CIFAR10',classifierType = 'cnn',dataFolderPath='./da
 
 if(opt.adv =='1'):
 	attackerOne(dataset= opt.dataset,classifierType = opt.classifierType,dataFolderPath=opt.dataFolderPath,pathToLoadData = opt.pathToLoadData,num_epoch = opt.num_epoch,preprocessData=opt.preprocessData,trainTargetModel = opt.trainTargetModel, trainShadowModel = opt.trainShadowModel)
+	
 	
 elif(opt.adv =='2'):
 	attackerTwo(dataset1= opt.dataset,dataset2= opt.dataset2,classifierType1 = opt.classifierType,classifierType2 = opt.classifierType2,dataFolderPath=opt.dataFolderPath,pathToLoadData = opt.pathToLoadData,num_epoch = opt.num_epoch, preprocessData = opt.preprocessData, trainTargetModel = opt.trainTargetModel, trainShadowModel = opt.trainShadowModel)

@@ -27,7 +27,7 @@ def train_target_model(dataset,epochs=100, batch_size=100, learning_rate=0.01, l
 
     
     train_x, train_y, test_x, test_y = dataset
-
+    # 训练模型
     output_layer = train_model(dataset, n_hidden=n_hidden, epochs=epochs, learning_rate=learning_rate,
                                batch_size=batch_size, model=model, l2_ratio=l2_ratio)
     # test data for attack model

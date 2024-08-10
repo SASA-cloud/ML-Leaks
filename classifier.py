@@ -39,7 +39,7 @@ def iterate_minibatches(inputs, targets, batch_size, shuffle=True):
 
 
 
-
+# CNN模型
 def get_cnn_model(n_in, n_hidden, n_out):
     net = dict()
     net['input'] = lasagne.layers.InputLayer(shape=(None, n_in[1], n_in[2], n_in[3]))
@@ -94,7 +94,7 @@ def get_softmax_model(n_in, n_out):
         nonlinearity=lasagne.nonlinearities.softmax)
     return net
 
-
+# 训练attack model
 def train_model(dataset, n_hidden=50, batch_size=100, epochs=100, learning_rate=0.01, model='cnn', l2_ratio=1e-7):
 
     
@@ -111,19 +111,19 @@ def train_model(dataset, n_hidden=50, batch_size=100, epochs=100, learning_rate=
     else:
         input_var = T.matrix('x')
     target_var = T.ivector('y')
-    if model == 'cnn':
+    if model == 'cnn': # cnn
         print('Using a multilayer convolution neural network based model...')
         net = get_cnn_model(n_in, n_hidden, n_out)        
-    elif model == 'nn':
+    elif model == 'nn': # dnn
         print('Using a multilayer neural network based model...')
         net = get_nn_model(n_in, n_hidden, n_out)
-    else:
+    else: # single layer nn
         print('Using a single layer softmax based model...')
         net = get_softmax_model(n_in, n_out)
 
     net['input'].input_var = input_var
     
-    output_layer = net['output']
+    output_layer = net['output'] # 输出层
     # create loss function
     prediction = lasagne.layers.get_output(output_layer)
     loss = lasagne.objectives.categorical_crossentropy(prediction, target_var)
@@ -136,6 +136,8 @@ def train_model(dataset, n_hidden=50, batch_size=100, epochs=100, learning_rate=
     # use trained network for predictions
     test_prediction = lasagne.layers.get_output(output_layer, deterministic=True)
     test_fn = theano.function([input_var], test_prediction)
+
+    # 进行训练
     print('Training...')
     counter = 1
     for epoch in range(epochs):
